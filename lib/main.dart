@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'package:googleapis/youtube/v3.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const MyApp());
@@ -59,8 +60,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
   }
 
   Future<void> _reorderPlaylist(int oldIndex, int newIndex) async {
-    var newPosition =
-        newIndex == 0 ? 0 : _playlistItems[newIndex - 1].snippet!.position! + 1;
     if (newIndex > oldIndex) {
       newIndex -= 1;
     }
@@ -71,7 +70,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
     });
     try {
       await ApiService.updatePlaylistItem(context, _playlistId, item.id!,
-          item.snippet!.resourceId!.videoId!, newPosition);
+          item.snippet!.resourceId!.videoId!, newIndex);
     } catch (error) {
       if (!mounted) return;
       showDialog(
@@ -114,8 +113,21 @@ class _PlaylistPageState extends State<PlaylistPage> {
                     children: _playlistItems.map((item) {
                       return ListTile(
                         key: Key(item.contentDetails!.videoId!),
-                        leading: Image.network(
-                            item.snippet!.thumbnails!.default_!.url!),
+                        leading: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                                onTap: () {
+                                  launchUrl(Uri(
+                                      scheme: "https",
+                                      host: "www.youtube.com",
+                                      path: "watch",
+                                      queryParameters: {
+                                        "v": item.snippet?.resourceId?.videoId,
+                                        "list": _playlistId,
+                                      }));
+                                },
+                                child: Image.network(
+                                    item.snippet!.thumbnails!.default_!.url!))),
                         title: Text(item.snippet!.title!),
                       );
                     }).toList(),
