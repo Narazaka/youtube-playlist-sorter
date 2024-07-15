@@ -59,6 +59,8 @@ class _PlaylistPageState extends State<PlaylistPage> {
   }
 
   Future<void> _reorderPlaylist(int oldIndex, int newIndex) async {
+    var newPosition =
+        newIndex == 0 ? 0 : _playlistItems[newIndex - 1].snippet!.position! + 1;
     if (newIndex > oldIndex) {
       newIndex -= 1;
     }
@@ -67,8 +69,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
       item = _playlistItems.removeAt(oldIndex);
       _playlistItems.insert(newIndex, item);
     });
-    var newPosition =
-        newIndex == 0 ? 0 : _playlistItems[newIndex - 1].snippet!.position!;
     try {
       await ApiService.updatePlaylistItem(context, _playlistId, item.id!,
           item.snippet!.resourceId!.videoId!, newPosition);
