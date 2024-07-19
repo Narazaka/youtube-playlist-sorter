@@ -128,7 +128,8 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                 },
                                 child: Image.network(
                                     item.snippet!.thumbnails!.default_!.url!))),
-                        title: Text(item.snippet!.title!),
+                        title: Text(
+                            "${item.snippet!.position} ${item.snippet!.title!}"),
                       );
                     }).toList(),
                   ),
